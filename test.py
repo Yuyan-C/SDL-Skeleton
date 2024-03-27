@@ -10,29 +10,31 @@ import matplotlib.pylab as pylab
 import scipy.io as scio
 import scipy.misc as mc
 import importlib
-from datasets.sklarge import TestDataset
+from dataloader.sklarge_flux import TestDataLayer as TestDataset
 
 
-network = 'hed'
+network = "deep_flux"
 gpu_id = 0
 
-torch.set_default_tensor_type('torch.cuda.FloatTensor')
+torch.set_default_tensor_type("torch.cuda.FloatTensor")
 torch.cuda.set_device(gpu_id)
 
-Network = getattr(importlib.import_module('networks.' + network), 'Network')
+Network = getattr(importlib.import_module("networks." + network), "Network")
 net = Network().cuda(gpu_id).eval()
-net.load_state_dict(torch.load('./weights/hed_sklarge/hed_30000.pth', map_location=lambda storage, loc: storage))
+net.load_state_dict(
+    torch.load("./weights/deep_flux.pth", map_location=lambda storage, loc: storage)
+)
 
-root = './OriginalSKLARGE/images/test'
-files = './OriginalSKLARGE/test.lst'
+root = "/network/scratch/y/yuyan.chen/SKLARGE/images/test"
+files = "/network/scratch/y/yuyan.chen/SKLARGE/test.lst"
 
 
-dataset = TestDataset(files, root)
+dataset = TestDataset(root)
 dataloader = list(DataLoader(dataset, batch_size=1))
 
 
 def plot_single_scale(scale_lst, size):
-    pylab.rcParams['figure.figsize'] = size / 2, size / 2.5
+    pylab.rcParams["figure.figsize"] = size / 2, size / 2.5
     plt.figure()
     for i, image in enumerate(scale_lst):
         image = image.data[0, 0].cpu().numpy().astype(np.float32)
@@ -40,8 +42,8 @@ def plot_single_scale(scale_lst, size):
         plt.imshow(1 - image, cmap=cm.Greys_r)
         s.set_xticklabels([])
         s.set_yticklabels([])
-        s.yaxis.set_ticks_position('none')
-        s.xaxis.set_ticks_position('none')
+        s.yaxis.set_ticks_position("none")
+        s.xaxis.set_ticks_position("none")
     plt.tight_layout()
 
 
@@ -55,7 +57,7 @@ plot_single_scale(scale_lst, 22)
 plt.show()
 
 
-output_dir = 'outputs/hed/'
+output_dir = "outputs/"
 
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
@@ -64,12 +66,10 @@ tep = 1
 for inp, fname in dataloader:
     inp = Variable(inp.cuda(gpu_id))
     out = net(inp)
-    fileName = output_dir + fname[0] + '.mat'
+    fileName = output_dir + fname[0] + ".mat"
     # file_jpg = output_dir + fname[0] + '.jpg'
     tep += 1
-    scio.savemat(fileName, {'sym': out.data[0, 0].cpu().numpy()})
+    scio.savemat(fileName, {"sym": out.data[0, 0].cpu().numpy()})
     # mc.toimage(out.cpu().detach()[0, 0, :, :]).save(file_jpg)
 diff_time = time.time() - start_time
-print('Detection took {:.5f}s per image'.format(diff_time / len(dataloader)))
-
-
+print("Detection took {:.5f}s per image".format(diff_time / len(dataloader)))
