@@ -57,7 +57,7 @@ class Trainer(object):
             if (step + 1) % self.args.disp_interval == 0:
                 timestr = time.strftime(self.timeformat, time.localtime())
                 print('{} iter={} loss={:<8.2f}'.format(
-                    timestr, step + 1, lossAcc / self.args.disp_interval / self.args.iter_size))
+                    timestr, step + 1, lossAcc / self.args.disp_interval / self.args.iter_size), flush=True)
                 lossAcc = 0.0
 
             if (step + 1) % self.args.save_interval == 0:

@@ -16,7 +16,11 @@ def count_parameters_in_MB(model):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="TRAIN SKLARGE")
-    parser.add_argument("--root", default="./SKLARGE", type=str)
+    parser.add_argument(
+        "--root",
+        default="/network/scratch/y/yuyan.chen/SKLARGE/groundTruth/train",
+        type=str,
+    )
     parser.add_argument(
         "--files", default="./SKLARGE/aug_data/train_pair.lst", type=str
     )
@@ -41,6 +45,7 @@ def parse_args():
 
 
 if __name__ == "__main__":
+    print("start", flush=True)
     args = parse_args()
     torch.set_default_tensor_type("torch.cuda.FloatTensor")
     torch.cuda.set_device(args.gpu_id)
