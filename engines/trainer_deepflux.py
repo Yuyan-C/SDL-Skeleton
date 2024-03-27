@@ -45,9 +45,9 @@ class Trainer(object):
                     Variable(dilmask),
                 )
 
-                loss = self.network(image, flux, dilmask)
-                if np.isnan(float(loss.data[0])):
-                    raise ValueError("loss is nan while training")
+                loss = self.network(image, flux, dilmask).unsqueeze(0)
+                # if np.isnan(float(loss.data[0])):
+                #     raise ValueError("loss is nan while training")
                 losses.append(loss)
                 lossAcc += loss.data[0]
 
